@@ -9,14 +9,58 @@ namespace Treeview_DragAndDrop.Models
     public class TreeNodeModel : INotifyPropertyChanged
     {
         public int Id { get; set; }
-        public string IconUrl { get; set; }
+        private string imgUrl;
+
+        public string IconUrl
+        {
+            get { return imgUrl; }
+            set { imgUrl = value; OnPropertyChanged(); }
+        }
+
         public string Text { get; set; }
-        public bool IsExpanded { get; set; } = true;
+        private bool isExpanded;
+
+        public bool IsExpanded
+        {
+            get { return isExpanded; }
+            set
+            {
+                isExpanded = value;
+                OnPropertyChanged();
+                if (value)
+                {
+                    IconUrl = "Assets/FolderOpen.png";
+                    ExpandIconUrl = "Assets/OpenGlyph.png";
+                }
+                else
+                {
+                    IconUrl = "Assets/FolderClosed.png";
+                    ExpandIconUrl = "Assets/CollapsedGlyph.png";
+                }
+            }
+        }
+
+        private string expandIconUrl;
+
+        public string ExpandIconUrl
+        {
+            get { return expandIconUrl; }
+            set
+            {
+                expandIconUrl = value;
+                OnPropertyChanged();
+            }
+        }
+
+
         public IList<TreeNodeModel> Children { get; set; }
 
         public TreeNodeModel()
         {
             Children = new List<TreeNodeModel>();
+            IconUrl = "Assets/FolderClosed.png";
+            ExpandIconUrl = "Assets/CollapsedGlyph.png";
+            IsExpanded = false;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

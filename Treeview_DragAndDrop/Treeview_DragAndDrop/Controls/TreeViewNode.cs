@@ -21,8 +21,7 @@ namespace Treeview_DragAndDrop.Controls
         {
             Expander rootExpander = new Expander()
             {
-                Header = CreateHeaderText(nodeData, Depth)
-
+                Header = CreateHeaderText(Depth)
             };
             rootExpander.BindingContext = nodeData;
             rootExpander.SetBinding(Expander.IsExpandedProperty, nameof(nodeData.IsExpanded));
@@ -36,16 +35,14 @@ namespace Treeview_DragAndDrop.Controls
             Expander subExpander = new Expander();
             foreach (var child in rootNode.Children)
             {
-                subExpander.Header = CreateHeaderText(rootNode, depth);
-                subExpander.Content = GetSubNodeList(child, depth + 1);
-            }
-            subExpander.BindingContext = nodeData;
-            subExpander.SetBinding(Expander.IsExpandedProperty, nameof(nodeData.IsExpanded));
-
+                subExpander.Header = CreateHeaderText(depth);
+                subExpander.Content = new TreeViewNode(child, depth + 1).CreateNodeView();
+            };
             return subExpander;
         }
 
-        private StackLayout CreateHeaderText(TreeNodeModel node, int depth)
+
+        private StackLayout CreateHeaderText(int depth)
         {
             BoxView _SpacerBoxView = new BoxView();
             StackLayout headerStack = new StackLayout()
@@ -57,13 +54,26 @@ namespace Treeview_DragAndDrop.Controls
             _SpacerBoxView.WidthRequest = depth * 20;
 
             headerStack.Children.Add(_SpacerBoxView);
+            headerStack.Children.Add(CreateImageWithPropertyBinding(nameof(nodeData.ExpandIconUrl)));
+            headerStack.Children.Add(CreateImageWithPropertyBinding(nameof(nodeData.IconUrl)));
 
             Label textLabel = new Label();
-            textLabel.SetBinding(Label.TextProperty, nameof(node.Text));
-
+            textLabel.SetBinding(Label.TextProperty, nameof(nodeData.Text));
             headerStack.Children.Add(textLabel);
 
             return headerStack;
+        }
+
+        private Image CreateImageWithPropertyBinding(string nameProperty)
+        {
+            Image expandedStatusImage = new Image();
+
+            FileImageSource fileImageSource = new FileImageSource();
+            fileImageSource.SetBinding(FileImageSource.FileProperty, nameProperty);
+
+            expandedStatusImage.Source = fileImageSource;
+
+            return expandedStatusImage;
         }
     }
 }

@@ -11,14 +11,31 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\CollapsedGlyph.png" />
+    <None Remove="Assets\FolderClosed.png" />
+    <None Remove="Assets\FolderOpen.png" />
+    <None Remove="Assets\OpenGlyph.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\CollapsedGlyph.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\FolderClosed.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\FolderOpen.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\OpenGlyph.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Xamarin.CommunityToolkit" Version="1.1.0" />
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2012" />
     <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Windows.Foundation.UniversalApiContract">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Windows Kits\10\References\10.0.19041.0\Windows.Foundation.UniversalApiContract\10.0.0.0\Windows.Foundation.UniversalApiContract.winmd</HintPath>
-    </Reference>
-  </ItemGroup>
 </Project>
