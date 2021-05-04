@@ -12,7 +12,14 @@
         <Frame BackgroundColor="#2196F3" Padding="24" CornerRadius="0">
             <Label Text="Welcome to Xamarin.Forms!" HorizontalTextAlignment="Center" TextColor="White" FontSize="36"/>
         </Frame>
-        <controls:TreeviewControl ItemsSource="{Binding Path=FromTreeList}"></controls:TreeviewControl>
+        <StackLayout Orientation="Horizontal">
+            <Button Text="Open all" Command="{Binding Path=ExpandAllCommand}" WidthRequest="100"></Button>
+            <Button Text="Close all" Command="{Binding Path=CollapseAllCommand}"  WidthRequest="100"></Button>
+        </StackLayout>
+        <StackLayout Orientation="Horizontal">
+            <controls:TreeviewControl TreeSource="{Binding Path=FromTreeList}" WidthRequest="500" HeightRequest="1000"></controls:TreeviewControl>
+            <controls:TreeviewControl TreeSource="{Binding Path=ToTreeList}" WidthRequest="500"  HeightRequest="500"></controls:TreeviewControl>
+        </StackLayout>
     </StackLayout>
 
 </ContentPage>
