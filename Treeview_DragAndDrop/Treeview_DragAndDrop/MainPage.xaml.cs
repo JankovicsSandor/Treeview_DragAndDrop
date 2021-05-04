@@ -15,14 +15,8 @@ namespace Treeview_DragAndDrop
 
         public MainPage()
         {
-            BindingContext = new HomepageViewModel();
             InitializeComponent();
 
-        }
-
-        private void DragGestureRecognizer_DragStarting(object sender, DragStartingEventArgs e)
-        {
-            Debug.WriteLine("Drag Start");
         }
     }
 }

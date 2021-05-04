@@ -1,36 +1,51 @@
 ﻿using System;
+ using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Treeview_DragAndDrop.Models;
 using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
 
 namespace Treeview_DragAndDrop.Controls
 {
+
     public class TreeviewControl : ScrollView
     {
-        private readonly StackLayout _StackLayout = new StackLayout { Orientation = StackOrientation.Vertical };
+        private readonly StackLayout _StackLayout = new StackLayout { Orientation = StackOrientation.Vertical,VerticalOptions=LayoutOptions.FillAndExpand };
 
-        public IList<TreeNodeModel> ItemsSource
+        public ObservableCollection<TreeNodeModel> TreeSource
         {
-            get { return (IList<TreeNodeModel>)GetValue(ItemsSourceProperty); }
-            set { SetValue(ItemsSourceProperty, value); }
+            get { return (ObservableCollection<TreeNodeModel>)GetValue(TreeSourceProperty); }
+            set { SetValue(TreeSourceProperty, value); }
         }
 
 
-        public static readonly BindableProperty ItemsSourceProperty = BindableProperty.Create(propertyName: nameof(ItemsSource), returnType: typeof(IList<TreeNodeModel>),
-                                                                                      declaringType: typeof(TreeviewControl), defaultValue: new List<TreeNodeModel>(),
-                                                                                      defaultBindingMode: BindingMode.TwoWay, propertyChanged: ItemsSourceChanged);
-        private static void ItemsSourceChanged(BindableObject bindable, object oldValue, object newValue)
+        public static readonly BindableProperty TreeSourceProperty = BindableProperty.Create(propertyName: nameof(TreeSource),
+                                                                                      returnType: typeof(IEnumerable),
+                                                                                      declaringType: typeof(TreeviewControl),
+                                                                                      defaultValue: null,
+                                                                                      defaultBindingMode: BindingMode.TwoWay,
+                                                                                      propertyChanged: OnTreeSourceChanged);
+
+        private static void OnTreeSourceChanged(BindableObject bindable, object oldValue, object newValue)
         {
+            Debug.WriteLine("------------------------------------------------------");
             var control = (TreeviewControl)bindable;
-            control.ItemsSource = (IList<TreeNodeModel>)newValue;
+            control.TreeSource = (ObservableCollection<TreeNodeModel>)newValue;
 
-            foreach (var rootNode in control.ItemsSource)
+            if (control.TreeSource != null)
             {
-                control._StackLayout.Children.Add(new TreeViewNode(rootNode).CreateNodeView());
+                Debug.WriteLine(control.TreeSource.Count);
+                foreach (var rootNode in control.TreeSource)
+                {
+                    control._StackLayout.Children.Add(new TreeViewNode(rootNode).CreateNodeView());
+                }
             }
-
         }
+
 
         public TreeviewControl()
         {

@@ -14,7 +14,11 @@ namespace Treeview_DragAndDrop.Models
         public string IconUrl
         {
             get { return imgUrl; }
-            set { imgUrl = value; OnPropertyChanged(); }
+            set
+            {
+                imgUrl = value;
+                OnPropertyChanged();
+            }
         }
 
         public string Text { get; set; }
@@ -52,6 +56,8 @@ namespace Treeview_DragAndDrop.Models
             }
         }
 
+        public bool IsLeaf { get => Children.Count == 0; }
+
 
         public IList<TreeNodeModel> Children { get; set; }
 
@@ -68,6 +74,13 @@ namespace Treeview_DragAndDrop.Models
         void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"Id:{Id}, Text: {Text},Expanded: {IsExpanded}, Children:{Children}");
+            return sb.ToString();
         }
     }
 }

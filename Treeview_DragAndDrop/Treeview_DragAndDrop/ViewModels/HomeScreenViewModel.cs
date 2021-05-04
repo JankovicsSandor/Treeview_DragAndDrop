@@ -1,154 +1,281 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using Treeview_DragAndDrop.Models;
+using Xamarin.Forms;
 
 namespace Treeview_DragAndDrop.ViewModels
 {
-    public class HomeScreenViewModel
+    public class HomeScreenViewModel : INotifyPropertyChanged
     {
-        public IList<TreeNodeModel> FromTreeList { get; set; }
-        public IList<TreeNodeModel> ToTreeList { get; set; }
+        private ObservableCollection<TreeNodeModel> fromTreeList;
+        private ObservableCollection<TreeNodeModel> toTreeList;
+
+        public ObservableCollection<TreeNodeModel> FromTreeList
+        {
+            get => fromTreeList;
+            set { fromTreeList = value; OnPropertyChanged(); }
+        }
+        public ObservableCollection<TreeNodeModel> ToTreeList
+        {
+            get => toTreeList;
+            set { toTreeList = value; OnPropertyChanged(); }
+        }
+
+        public ICommand ExpandAllCommand { get; set; }
+        public ICommand CollapseAllCommand { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public HomeScreenViewModel()
         {
-            CreateTreeListCollections();
+            FromTreeList = new ObservableCollection<TreeNodeModel>();
+            ToTreeList = new ObservableCollection<TreeNodeModel>();
+            Task.Run(() => CreateTreeListCollections());
+            ExpandAllCommand = new Command(ExpandAll);
+            CollapseAllCommand = new Command(CloseAll);
+
+        }
+
+        private void ExpandAll(object obj)
+        {
+            foreach (var fromTree in FromTreeList)
+            {
+                this.ToggleRecursive(fromTree, true);
+            }
+            Debug.WriteLine("Done");
+        }
+
+        private void CloseAll(object obj)
+        {
+            foreach (var fromTree in FromTreeList)
+            {
+                this.ToggleRecursive(fromTree, false);
+            }
+            Debug.WriteLine("Done");
+        }
+
+        private void ToggleRecursive(TreeNodeModel node, bool value)
+        {
+            node.IsExpanded = value;
+            foreach (var nodeChild in node.Children)
+            {
+                ToggleRecursive(nodeChild, value);
+            }
+
         }
 
         private void CreateTreeListCollections()
         {
-            FromTreeList = new List<TreeNodeModel>();
-
-            FromTreeList.Add(new TreeNodeModel()
+            Device.BeginInvokeOnMainThread(() =>
             {
-                Id = 1,
-                Text = "Első",
-                IconUrl = "https://assets.coingecko.com/coins/images/1060/large/icon-icx-logo.png?1547035003",
-                Children = new List<TreeNodeModel>()
+                ObservableCollection<TreeNodeModel> treeNodeModels = new ObservableCollection<TreeNodeModel>();
+                treeNodeModels.Add(new TreeNodeModel()
+                {
+                    Id = 1,
+                    Text = "Első",
+                    Children = new List<TreeNodeModel>()
                     {
                         new TreeNodeModel() {
                             Id = 2,
                             Text = "Első.Egy",
-                            IconUrl = "https://assets.coingecko.com/coins/images/1060/large/icon-icx-logo.png?1547035003",
                         }
                     }
-            });
-            FromTreeList.Add(new TreeNodeModel()
-            {
-                Id = 1,
-                Text = "Masodik",
-                IconUrl = "https://assets.coingecko.com/coins/images/1060/large/icon-icx-logo.png?1547035003",
-                Children = new List<TreeNodeModel>()
+                });
+
+                List<TreeNodeModel> resList = new List<TreeNodeModel>();
+
+                for (int i = 0; i < 100; i++)
+                {
+                    resList.Add(new TreeNodeModel()
+                    {
+                        Id = i,
+                        Text = $"Node#{i}"
+                    });
+                }
+
+                treeNodeModels.Add(new TreeNodeModel()
+                {
+                    Id = 1,
+                    Text = "Masodik",
+                    Children = new List<TreeNodeModel>()
                     {
                         new TreeNodeModel() {
                             Id = 2,
                             Text = "Masodik.Egy",
-                            IconUrl = "https://assets.coingecko.com/coins/images/1060/large/icon-icx-logo.png?1547035003",
+                            Children=resList
+                        },
+                        new TreeNodeModel() {
+                            Id = 2,
+                            Text = "Masodik.Egy",
                             Children=new List<TreeNodeModel>()
                             {
                                 new TreeNodeModel(){
                                     Id = 1,
                                     Text = "Masodik.Egy.Egy",
-                                    IconUrl = "https://assets.coingecko.com/coins/images/1060/large/icon-icx-logo.png?1547035003",
                                     Children = new List<TreeNodeModel>()
                                      {
                                        new TreeNodeModel() {
                                             Id = 2,
                                             Text = "Masodik.Egy.Egy.Egy",
-                                            IconUrl = "https://assets.coingecko.com/coins/images/1060/large/icon-icx-logo.png?1547035003",
+                                       }
+                                    }
+                                }
+                            }
+                        },
+                        new TreeNodeModel() {
+                            Id = 2,
+                            Text = "Masodik.Egy",
+                            Children=new List<TreeNodeModel>()
+                            {
+                                new TreeNodeModel(){
+                                    Id = 1,
+                                    Text = "Masodik.Egy.Egy",
+                                    Children = new List<TreeNodeModel>()
+                                     {
+                                       new TreeNodeModel() {
+                                            Id = 2,
+                                            Text = "Masodik.Egy.Egy.Egy",
+                                       }
+                                    }
+                                }
+                            }
+                        },new TreeNodeModel() {
+                            Id = 2,
+                            Text = "Masodik.Egy",
+                            Children=new List<TreeNodeModel>()
+                            {
+                                new TreeNodeModel(){
+                                    Id = 1,
+                                    Text = "Masodik.Egy.Egy",
+                                    Children = new List<TreeNodeModel>()
+                                     {
+                                       new TreeNodeModel() {
+                                            Id = 2,
+                                            Text = "Masodik.Egy.Egy.Egy",
+                                       }
+                                    }
+                                }
+                            }
+                        },new TreeNodeModel() {
+                            Id = 2,
+                            Text = "Masodik.Egy",
+                            Children=new List<TreeNodeModel>()
+                            {
+                                new TreeNodeModel(){
+                                    Id = 1,
+                                    Text = "Masodik.Egy.Egy",
+                                    Children = new List<TreeNodeModel>()
+                                     {
+                                       new TreeNodeModel() {
+                                            Id = 2,
+                                            Text = "Masodik.Egy.Egy.Egy",
                                        }
                                     }
                                 }
                             }
                         }
                     }
-            });
-            FromTreeList.Add(new TreeNodeModel()
-            {
-                Id = 1,
-                Text = "Első",
-                IconUrl = "https://assets.coingecko.com/coins/images/1060/large/icon-icx-logo.png?1547035003",
-                Children = new List<TreeNodeModel>()
+                });
+                treeNodeModels.Add(new TreeNodeModel()
+                {
+                    Id = 1,
+                    Text = "Első",
+                    Children = new List<TreeNodeModel>()
                     {
                         new TreeNodeModel() {
                             Id = 2,
                             Text = "Első.Egy",
-                            IconUrl = "https://assets.coingecko.com/coins/images/1060/large/icon-icx-logo.png?1547035003",
+                            Children=new List<TreeNodeModel>(){
+                               new TreeNodeModel()
+                               {
+                                    Id=3,
+                                    Text="Almafa"
+                               }
+                            }
                         }
                     }
-            });
-            FromTreeList.Add(new TreeNodeModel()
-            {
-                Id = 1,
-                Text = "Első",
-                IconUrl = "https://assets.coingecko.com/coins/images/1060/large/icon-icx-logo.png?1547035003",
-                Children = new List<TreeNodeModel>()
+                });
+                treeNodeModels.Add(new TreeNodeModel()
+                {
+                    Id = 1,
+                    Text = "Első",
+                    Children = new List<TreeNodeModel>()
                     {
                         new TreeNodeModel() {
                             Id = 2,
                             Text = "Első.Egy",
-                            IconUrl = "https://assets.coingecko.com/coins/images/1060/large/icon-icx-logo.png?1547035003",
                         }
                     }
+                });
+                FromTreeList = treeNodeModels;
             });
 
-            ToTreeList = new List<TreeNodeModel>();
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                ObservableCollection<TreeNodeModel> toTreeNodeModels = new ObservableCollection<TreeNodeModel>();
+                toTreeNodeModels.Add(new TreeNodeModel()
+                {
+                    Id = 1,
+                    Text = "Első",
+                    Children = new List<TreeNodeModel>()
+                    {
+                        new TreeNodeModel() {
+                            Id = 2,
+                            Text = "Első.Egy",
+                        }
+                    }
+                });
+                toTreeNodeModels.Add(new TreeNodeModel()
+                {
+                    Id = 1,
+                    Text = "Első",
 
-            ToTreeList.Add(new TreeNodeModel()
-            {
-                Id = 1,
-                Text = "Első",
-                IconUrl = "https://assets.coingecko.com/coins/images/1060/large/icon-icx-logo.png?1547035003",
-                Children = new List<TreeNodeModel>()
+                    Children = new List<TreeNodeModel>()
                     {
                         new TreeNodeModel() {
                             Id = 2,
                             Text = "Első.Egy",
-                            IconUrl = "https://assets.coingecko.com/coins/images/1060/large/icon-icx-logo.png?1547035003",
                         }
                     }
-            });
-            ToTreeList.Add(new TreeNodeModel()
-            {
-                Id = 1,
-                Text = "Első",
-                IconUrl = "https://assets.coingecko.com/coins/images/1060/large/icon-icx-logo.png?1547035003",
-                Children = new List<TreeNodeModel>()
+                });
+                toTreeNodeModels.Add(new TreeNodeModel()
+                {
+                    Id = 1,
+                    Text = "Első",
+                    Children = new List<TreeNodeModel>()
                     {
                         new TreeNodeModel() {
                             Id = 2,
                             Text = "Első.Egy",
-                            IconUrl = "https://assets.coingecko.com/coins/images/1060/large/icon-icx-logo.png?1547035003",
                         }
                     }
-            });
-            ToTreeList.Add(new TreeNodeModel()
-            {
-                Id = 1,
-                Text = "Első",
-                IconUrl = "https://assets.coingecko.com/coins/images/1060/large/icon-icx-logo.png?1547035003",
-                Children = new List<TreeNodeModel>()
+                });
+                toTreeNodeModels.Add(new TreeNodeModel()
+                {
+                    Id = 1,
+                    Text = "Első",
+                    Children = new List<TreeNodeModel>()
                     {
                         new TreeNodeModel() {
                             Id = 2,
                             Text = "Első.Egy",
-                            IconUrl = "https://assets.coingecko.com/coins/images/1060/large/icon-icx-logo.png?1547035003",
                         }
                     }
-            });
-            ToTreeList.Add(new TreeNodeModel()
-            {
-                Id = 1,
-                Text = "Első",
-                IconUrl = "https://assets.coingecko.com/coins/images/1060/large/icon-icx-logo.png?1547035003",
-                Children = new List<TreeNodeModel>()
-                    {
-                        new TreeNodeModel() {
-                            Id = 2,
-                            Text = "Első.Egy",
-                            IconUrl = "https://assets.coingecko.com/coins/images/1060/large/icon-icx-logo.png?1547035003",
-                        }
-                    }
+                });
+                ToTreeList = toTreeNodeModels;
             });
         }
     }
